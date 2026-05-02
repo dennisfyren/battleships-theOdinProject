@@ -7,7 +7,6 @@ export class Ship {
   }
   hit() {
     this.hits++;
-    console.log("Yep");
     this.sink();
   }
   sink() {

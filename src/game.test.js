@@ -12,3 +12,7 @@ test("Hit reg", () => {
 test("Hit reg", () => {
   expect(game.recieveAttack([4, 8])).toBe("Miss!");
 });
+
+test("Ship out of bounds", () => {
+  expect(game.placeShip([7, 6], 5)).toBe("Position must be within bounds");
+});
