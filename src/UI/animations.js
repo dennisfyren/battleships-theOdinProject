@@ -3,6 +3,6 @@ export class UI {
     element.classList.add("attack");
     setTimeout(() => {
       element.classList.remove("attack");
-    }, 1300);
+    }, 800);
   }
 }

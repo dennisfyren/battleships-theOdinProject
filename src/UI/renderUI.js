@@ -27,6 +27,17 @@ export const createPlayer = (type) => {
       });
       if (type === "computer") {
         innerBox.addEventListener("click", () => {
+          const result = playerInfo.game.recieveAttack([j, i]);
+          if (result === "Hit!") {
+            innerBox.classList.add("hit");
+          } else if (result === "Miss!") {
+            innerBox.classList.add("miss");
+          } else {
+            return;
+          }
+        });
+
+        innerBox.addEventListener("click", () => {
           animate.attack(innerBox);
         });
       }

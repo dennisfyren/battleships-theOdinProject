@@ -79,20 +79,17 @@ body h1 {
   height: 50px;
   width: 500px;
   border: 1px solid var(--border-color);
-  /* border-bottom: 1px solid var(--border-color); */
 }
 .grid-inner-box {
   width: 50px;
   background-color: var(--display-color);
 }
 .computer div div div:hover {
-  background-color: var(--hover-color);
   cursor: crosshair;
 }
 .attack {
-  animation-duration: 1.3s;
+  animation-duration: 0.8s;
   animation-name: attack;
-  transition: ease-out;
 }
 .grid-box {
   display: flex;
@@ -103,28 +100,28 @@ body h1 {
   border: 2px solid transparent;
   transition: 1s ease-in;
 }
+.hit {
+  background-color: var(--hit);
+}
+.miss {
+  background-color: var(--safe);
+}
 
 @keyframes attack {
   0% {
     transform: scale(1);
     border: 1px solid var(--border-color);
-    background-color: var(--background-color);
   }
   30% {
-    background-color: var(--warning);
     border-radius: 50%;
   }
-  50% {
-    transform: scale(2);
+  40% {
+    transform: scale(2.2);
     border-radius: 50%;
   }
-  75% {
-    background-color: var(--warning);
-  }
-
   100% {
     transform: scale(1);
-    background-color: var(--background-color);
+
     border: 1px solid var(--border-color);
   }
 }

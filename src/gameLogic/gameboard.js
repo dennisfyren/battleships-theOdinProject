@@ -45,6 +45,7 @@ export class Gameboard {
     return `Created new ship at [${ship.position[0].toString()}]`;
   }
   recieveAttack(position) {
+    console.log(this.ships);
     if (
       this.previousAttacks.some(
         (attack) => attack.toString() == position.toString(),
