@@ -4,6 +4,8 @@ export class Ship {
     this.hits = 0;
     this.isSunk = false;
     this.position = [];
+    //Rotation will be 0 for horizontal and 1 for vertical.
+    this.rotation = 0;
   }
   hit() {
     this.hits++;
