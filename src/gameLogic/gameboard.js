@@ -3,8 +3,11 @@ import { Ship } from "./ships.js";
 export class Gameboard {
   constructor() {
     this.ships = [];
+    this.missedAttacks = [];
+    this.previousAttacks = [];
   }
   placeShip(position, length, rotation) {
+    if (this.ships.length === 5) return "Too many ships";
     if (rotation === 1) {
       if (
         position[0] < 1 ||
@@ -42,15 +45,34 @@ export class Gameboard {
     return `Created new ship at [${ship.position[0].toString()}]`;
   }
   recieveAttack(position) {
+    if (
+      this.previousAttacks.some(
+        (attack) => attack.toString() == position.toString(),
+      )
+    )
+      return "Can't attack the same tile twice";
+    this.previousAttacks.push(position);
     const hit = this.ships.some((ship) => {
       return ship.position.some((tile) => {
         if (position.toString() === tile.toString()) {
           ship.hit();
           return true;
+        } else {
+          return false;
         }
-        return false;
       });
     });
+    if (hit === false) {
+      if (
+        !this.missedAttacks.some(
+          (item) => item.toString() == position.toString(),
+        )
+      ) {
+        this.missedAttacks.push(position);
+      }
+    } else {
+      this.checkRemaining();
+    }
     return hit ? "Hit!" : "Miss!";
   }
   checkCollision(ship) {
@@ -61,5 +83,10 @@ export class Gameboard {
         );
       });
     });
+  }
+  checkRemaining() {
+    const ships = this.ships;
+    const response = this.ships.every((ship) => ship.isSunk === true);
+    console.log(!response ? "Go on" : "Game over");
   }
 }

@@ -1,5 +1,105 @@
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+:root {
+  --background-color: #0d1b26;
+  --border-color: #5ab3cc;
+  --hover-color: #2a7fa8;
+  --ship-color: #7ecfa0;
+  --warning: #c8a93a;
+  --hit: #b84040;
+  --safe: #3a7a3a;
+  --sunk: #7a2020;
+}
+html {
+  background-color: var(--background-color);
+  height: 100vh;
+}
+body {
+  height: 100%;
+}
+
+.main {
+  padding: 2rem 10% 2rem 10%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 2fr 1fr;
+  justify-items: center;
+  grid-template-areas:
+    "player computer"
+    "control control";
+}
+
+.player,
+.computer,
+.controls {
+  color: white;
+  border: 3px solid var(--border-color);
+}
+.player {
+  grid-area: player;
+}
+.computer {
+  grid-area: computer;
+}
+.controls {
+  margin-top: 5rem;
+  grid-area: control;
+  border: 1px solid var(--border-color);
+  width: 80%;
+  border-radius: 0.4rem;
+}
+.grid-box,
+.grid-inner-box {
+  height: 50px;
+  width: 500px;
+  border: 1px solid var(--border-color);
+  /* border-bottom: 1px solid var(--border-color); */
+}
+.grid-inner-box {
+  width: 50px;
+}
+.computer div div div:hover {
+  background-color: var(--hover-color);
+  cursor: crosshair;
+}
+.attack {
+  animation-duration: 1.3s;
+  animation-name: attack;
+  transition: ease-out;
+}
+.grid-box {
+  display: flex;
+  border: none;
+}
+.ship {
+  background-color: var(--ship-color);
+  border: 2px solid transparent;
+}
+
+@keyframes attack {
+  0% {
+    transform: scale(1);
+    border: 1px solid var(--border-color);
+    background-color: var(--background-color);
+  }
+  30% {
+    background-color: var(--warning);
+    border-radius: 50%;
+  }
+  50% {
+    transform: scale(2);
+    border-radius: 50%;
+  }
+  75% {
+    background-color: var(--warning);
+  }
+
+  100% {
+    transform: scale(1);
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+  }
 }
