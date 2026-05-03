@@ -10,18 +10,18 @@ export class Gameboard {
     if (this.ships.length === 5) return "Too many ships";
     if (rotation === 1) {
       if (
-        position[0] < 1 ||
-        position[0] + length - 1 > 10 ||
         position[1] < 1 ||
-        position[1] > 10
+        position[1] + length - 1 > 10 ||
+        position[0] < 1 ||
+        position[0] > 10
       )
         return "Position must be within bounds";
     } else if (rotation === 0) {
       if (
-        position[0] < 0 ||
-        position[0] > 10 ||
         position[1] < 0 ||
-        position[1] + length - 1 > 10
+        position[1] > 10 ||
+        position[0] < 0 ||
+        position[0] + length - 1 > 10
       )
         return "Position must be within bounds";
     } else {
@@ -31,11 +31,11 @@ export class Gameboard {
     ship.rotation = rotation;
     if (rotation === 1) {
       for (let i = 0; i < length; i++) {
-        ship.position.push([position[0] + i, position[1]]);
+        ship.position.push([position[1] + i, position[0]]);
       }
     } else {
       for (let i = 0; i < length; i++) {
-        ship.position.push([position[0], position[1] + i]);
+        ship.position.push([position[1], position[0] + i]);
       }
     }
     if (this.ships.length !== 0) {

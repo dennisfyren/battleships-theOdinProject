@@ -4,23 +4,37 @@
   padding: 0;
 }
 :root {
-  --background-color: #0d1b26;
+  --background-color: #0a111a;
   --border-color: #5ab3cc;
   --hover-color: #2a7fa8;
   --ship-color: #7ecfa0;
+  --display-color: #112233;
+  --panel-color: #233d52;
+  --panel-border-color: #3a6080;
   --warning: #c8a93a;
   --hit: #b84040;
   --safe: #3a7a3a;
   --sunk: #7a2020;
+  --background-gradient: radial-gradient(
+    circle,
+    rgba(31, 45, 64, 1) 26%,
+    rgba(13, 27, 38, 1) 71%
+  );
 }
 html {
   background-color: var(--background-color);
+  background: var(--background-gradient);
   height: 100vh;
 }
 body {
   height: 100%;
+  text-align: center;
+  padding-top: 1rem;
 }
-
+body h1 {
+  color: white;
+  letter-spacing: 0.5rem;
+}
 .main {
   padding: 2rem 10% 2rem 10%;
   display: grid;
@@ -36,13 +50,22 @@ body {
 .computer,
 .controls {
   color: white;
-  border: 3px solid var(--border-color);
+  background-color: var(--panel-color);
+  border: 3px solid var(--panel-border-color);
+  box-shadow:
+    inset 0 1px 0 #4a7a9a,
+    inset 0 -1px 0 #0d1b26;
 }
 .player {
   grid-area: player;
 }
 .computer {
   grid-area: computer;
+}
+.player,
+.computer {
+  padding: 5rem;
+  border-radius: 5%;
 }
 .controls {
   margin-top: 5rem;
@@ -60,6 +83,7 @@ body {
 }
 .grid-inner-box {
   width: 50px;
+  background-color: var(--display-color);
 }
 .computer div div div:hover {
   background-color: var(--hover-color);
@@ -77,6 +101,7 @@ body {
 .ship {
   background-color: var(--ship-color);
   border: 2px solid transparent;
+  transition: 1s ease-in;
 }
 
 @keyframes attack {

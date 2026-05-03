@@ -16,13 +16,20 @@ export const createPlayer = (type) => {
       playerInfo.game.ships.forEach((ship) => {
         ship.position.forEach((pos) => {
           if (pos.toString() == [j, i].toString()) {
-            innerBox.classList.add("ship");
+            if (type === "player") {
+              setTimeout(() => {
+                innerBox.classList.add("ship");
+                innerBox.style.cursor = "pointer";
+              }, 20);
+            }
           }
         });
       });
-      innerBox.addEventListener("click", () => {
-        animate.attack(innerBox);
-      });
+      if (type === "computer") {
+        innerBox.addEventListener("click", () => {
+          animate.attack(innerBox);
+        });
+      }
       innerBox.classList.add("grid-inner-box");
       box.appendChild(innerBox);
     }
@@ -36,15 +43,20 @@ function getData(type) {
   const player = new Player(type);
   const computer = new Computer(type);
   if (type === "player") {
-    player.game.placeShip([1, 1], 5, 0);
-    player.game.placeShip([2, 4], 3, 1);
-    player.game.placeShip([6, 6], 2, 0);
-    player.game.placeShip([10, 1], 4, 0);
+    player.game.placeShip([1, 2], 5, 0);
+    player.game.placeShip([4, 5], 4, 0);
+    player.game.placeShip([9, 1], 3, 1);
+    player.game.placeShip([7, 7], 3, 0);
+    player.game.placeShip([1, 10], 2, 0);
     return player;
   }
   if (type === "computer") {
     console.log("comp");
-    computer.game.placeShip([9, 2], 5, 0);
+    computer.game.placeShip([2, 9], 5, 0);
+    computer.game.placeShip([4, 2], 4, 1);
+    computer.game.placeShip([7, 2], 3, 1);
+    computer.game.placeShip([7, 6], 3, 0);
+    computer.game.placeShip([2, 7], 2, 0);
     return computer;
   }
 }
