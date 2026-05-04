@@ -1,4 +1,8 @@
-import { createPlayer } from "./renderUI.js";
+// import { createPlayer } from "./renderUI.js";
+import { Render } from "./renderUI.js";
 
-createPlayer("player");
-createPlayer("computer");
+const render = new Render();
+
+render.createPlayer("player");
+render.createPlayer("computer");
+render.renderLog();

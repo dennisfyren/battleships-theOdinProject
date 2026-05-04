@@ -1,3 +1,5 @@
+import { Render } from "../UI/renderUI.js";
+
 export class Ship {
   constructor(length) {
     this.size = length;
@@ -13,7 +15,11 @@ export class Ship {
   }
   sink() {
     if (this.hits == this.size) {
+      const render = new Render();
       this.isSunk = true;
+      setTimeout(() => {
+        render.log(`You sunk the enemy ship`);
+      }, 1000);
     }
   }
 }

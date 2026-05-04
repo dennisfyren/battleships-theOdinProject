@@ -14,7 +14,7 @@
   --warning: #c8a93a;
   --hit: #b84040;
   --safe: #3a7a3a;
-  --sunk: #7a2020;
+  --sunk: #663f3f;
   --background-gradient: radial-gradient(
     circle,
     rgba(31, 45, 64, 1) 26%,
@@ -73,7 +73,37 @@ body h1 {
   border: 1px solid var(--border-color);
   width: 80%;
   border-radius: 0.4rem;
+  padding: 2rem;
 }
+.console {
+  height: 180px;
+  background-color: var(--background-color);
+  width: 40%;
+  border-radius: 1rem;
+  border: 3px solid var(--panel-border-color);
+  box-shadow:
+    inset 0 1px 0 #4a7a9a,
+    inset 0 -1px 0 #0d1b26;
+  color: rgb(28, 255, 28);
+  overflow-y: hidden;
+  justify-self: end;
+  text-align: start;
+  padding: 0.5rem 4rem;
+  line-height: 1.5rem;
+  letter-spacing: 0.15rem;
+  font-size: 1.2rem;
+}
+.console p {
+  opacity: 70%;
+  position: relative;
+}
+.console p:first-of-type {
+  margin-bottom: 1rem;
+  animation-name: drop-in;
+  animation-duration: 0.6s;
+  animation-fill-mode: forwards;
+}
+
 .grid-box,
 .grid-inner-box {
   height: 50px;
@@ -86,6 +116,8 @@ body h1 {
 }
 .computer div div div:hover {
   cursor: crosshair;
+  transition: 0.2s ease-out;
+  transform: scale(1.3);
 }
 .attack {
   animation-duration: 0.8s;
@@ -106,22 +138,45 @@ body h1 {
 .miss {
   background-color: var(--safe);
 }
+.sunk {
+  background-color: var(--sunk);
+  transition: 0.7s ease;
+}
+.computer .sunk:hover,
+.computer .hit:hover,
+.computer .miss:hover {
+  transform: scale(1);
+  transition: none;
+}
 
+@keyframes drop-in {
+  from {
+    left: -100px;
+    opacity: 70%;
+    filter: blur(4px);
+  }
+  to {
+    filter: blur(0px);
+    left: 0px;
+    opacity: 100%;
+  }
+}
 @keyframes attack {
   0% {
     transform: scale(1);
     border: 1px solid var(--border-color);
+    z-index: 5;
   }
   30% {
     border-radius: 50%;
   }
   40% {
-    transform: scale(2.2);
+    transform: scale(2);
     border-radius: 50%;
   }
   100% {
     transform: scale(1);
-
+    z-index: 5;
     border: 1px solid var(--border-color);
   }
 }
