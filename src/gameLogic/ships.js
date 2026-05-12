@@ -8,6 +8,7 @@ export class Ship {
     this.position = [];
     //Rotation will be 0 for horizontal and 1 for vertical.
     this.rotation = 0;
+    this.isSelected = false;
   }
   hit() {
     this.hits++;

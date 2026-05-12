@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap");
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -6,8 +8,9 @@
 :root {
   --background-color: #0a111a;
   --border-color: #5ab3cc;
-  --hover-color: #2a7fa8;
+  --hover-color: #1d5a79;
   --ship-color: #7ecfa0;
+  --ship-color-selected: #e162fa;
   --display-color: #112233;
   --panel-color: #233d52;
   --panel-border-color: #3a6080;
@@ -15,6 +18,7 @@
   --hit: #b84040;
   --safe: #3a7a3a;
   --sunk: #663f3f;
+  --attack-hover: #8d2929;
   --background-gradient: radial-gradient(
     circle,
     rgba(31, 45, 64, 1) 26%,
@@ -25,6 +29,7 @@ html {
   background-color: var(--background-color);
   background: var(--background-gradient);
   height: 100vh;
+  font-family: "Share Tech Mono", "Courier New", monospace;
 }
 body {
   height: 100%;
@@ -74,11 +79,87 @@ body h1 {
   width: 80%;
   border-radius: 0.4rem;
   padding: 2rem;
+  display: grid;
+  grid-template-columns: 2fr 1.3fr;
 }
 .console {
+  display: flex;
+  transition: opacity 500ms;
+}
+#controlWindow {
+  padding-left: 4rem;
+  align-content: center;
+}
+.welcome {
+  position: absolute;
+  position-anchor: --input;
+  position-area: top span-right;
+  font-size: 1.4rem;
+  margin-bottom: 0.1rem;
+}
+#nameInput {
+  border-radius: 1rem 0 0 1rem;
+  anchor-name: --input;
+}
+.controls div input,
+.controls div button {
+  height: 3rem;
+  width: 15rem;
+  background-color: var(--display-color);
+  color: white;
+  font-size: 1.4rem;
+  margin-right: 0.1rem;
+  padding-left: 1rem;
+  border: 2px solid var(--panel-border-color);
+  border-radius: 1rem;
+}
+.controls div button {
+  width: 10rem;
+  border-radius: 0 1rem 1rem 0;
+  text-align: start;
+}
+.controls div div button {
+  border-radius: 0.5rem;
+  animation: 0.4s fade-in;
+  box-shadow:
+    inset 0 1px 0 #4a7a9a,
+    inset 0 -1px 0 #0d1b26;
+}
+.controls div div {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas: "info attack";
+  gap: 1rem;
+}
+.controls div button:hover {
+  background-color: var(--hover-color);
+}
+#attack {
+  grid-area: attack;
+  height: 150px;
+  background-color: var(--hit);
+  box-shadow:
+    inset 0 1px 0 #4a7a9a,
+    inset 0 -1px 0 #0d1b26;
+  text-align: center;
+  padding: 0;
+  border-radius: 1rem;
+  justify-self: end;
+  margin-right: 1rem;
+  margin-left: auto;
+}
+#attack:hover {
+  background-color: var(--attack-hover);
+  font-size: 1.6rem;
+}
+.console {
+  display: flex;
+  flex-direction: column;
   height: 180px;
   background-color: var(--background-color);
-  width: 40%;
+  width: 100%;
   border-radius: 1rem;
   border: 3px solid var(--panel-border-color);
   box-shadow:
@@ -103,7 +184,6 @@ body h1 {
   animation-duration: 0.6s;
   animation-fill-mode: forwards;
 }
-
 .grid-box,
 .grid-inner-box {
   height: 50px;
@@ -130,7 +210,12 @@ body h1 {
 .ship {
   background-color: var(--ship-color);
   border: 2px solid transparent;
-  transition: 1s ease-in;
+  transition: 0.3s ease-out;
+}
+.selected {
+  background-color: var(--ship-color-selected);
+  transform: scale(1.1);
+  box-shadow: 6px 6px rgba(0, 0, 0, 0.466);
 }
 .hit {
   background-color: var(--hit);
@@ -178,5 +263,13 @@ body h1 {
     transform: scale(1);
     z-index: 5;
     border: 1px solid var(--border-color);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0%;
+  }
+  to {
+    opacity: 100%;
   }
 }
