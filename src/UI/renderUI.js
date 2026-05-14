@@ -28,11 +28,9 @@ export class Render {
       return computer;
     }
   }
-  renderArea() {}
   createPlayer(type) {
     const animate = new UI();
     const playerInfo = this.player;
-    console.log(playerInfo);
     const player = document.querySelector("." + type);
     const playerDisplay = document.createElement("div");
     for (let j = 10; j > 0; j--) {
@@ -51,31 +49,34 @@ export class Render {
           });
         });
         innerBox.id = `${type}-${j}-${i}`;
-        playerInfo.game.ships.forEach((ship) => {
-          ship.position.forEach((pos) => {
-            if (pos.toString() == [j, i].toString()) {
-              if (type === "player") {
-                innerBox.addEventListener("click", () => {
-                  ship.isSelected = true;
-                  playerInfo.game.ships.forEach((newShip) => {
-                    if (newShip.isSelected === true) {
-                      newShip.position.forEach((pos) => {
-                        const box = document.querySelector(
-                          `#player-${pos[0]}-${pos[1]}`,
-                        );
-                        box.classList.add("selected");
-                      });
-                    }
-                  });
-                });
-                setTimeout(() => {
-                  innerBox.classList.add("ship");
-                  innerBox.style.cursor = "pointer";
-                }, 20);
-              }
-            }
-          });
-        });
+
+        //REFACTOR THIS INTO BUILDGRID METHOD!!
+
+        // playerInfo.game.ships.forEach((ship) => {
+        //   ship.position.forEach((pos) => {
+        //     if (pos.toString() == [j, i].toString()) {
+        //       if (type === "player") {
+        //         innerBox.addEventListener("click", () => {
+        //           ship.isSelected = true;
+        //           playerInfo.game.ships.forEach((newShip) => {
+        //             if (newShip.isSelected === true) {
+        //               newShip.position.forEach((pos) => {
+        //                 const box = document.querySelector(
+        //                   `#player-${pos[0]}-${pos[1]}`,
+        //                 );
+        //                 box.classList.add("selected");
+        //               });
+        //             }
+        //           });
+        //         });
+        //         setTimeout(() => {
+        //           innerBox.classList.add("ship");
+        //           innerBox.style.cursor = "pointer";
+        //         }, 20);
+        //       }
+        //     }
+        //   });
+        // });
         if (type === "computer") {
           innerBox.addEventListener("click", () => {
             if (this.gamestart === false) {
@@ -95,8 +96,6 @@ export class Render {
               return;
             }
           });
-
-          innerBox.addEventListener("click", () => {});
         }
         innerBox.classList.add("grid-inner-box");
         box.appendChild(innerBox);
@@ -105,6 +104,27 @@ export class Render {
       playerDisplay.appendChild(box);
     }
     player.appendChild(playerDisplay);
+    this.buildGrid();
+  }
+  buildGrid() {
+    this.player.game.ships.forEach((ship) => {
+      ship.position.forEach((pos) => {
+        const box = document.querySelector(`#player-${pos[0]}-${pos[1]}`);
+        box.classList.add("ship");
+        box.addEventListener("click", (e) => {
+          e.stopImmediatePropagation();
+          console.log(ship);
+          this.player.game.ships.forEach((ship) => {
+            ship.isSelected = false;
+          });
+          ship.isSelected = true;
+          ship.position.forEach((pos) => {
+            const box = document.querySelector(`#player-${pos[0]}-${pos[1]}`);
+            box.classList.add("selected");
+          });
+        });
+      });
+    });
   }
   renderLog() {
     const controls = document.querySelector(".controls");
@@ -168,7 +188,6 @@ export class Render {
       return;
     }
     const div = target;
-    console.log(div);
     this.clearLog();
     this.log(
       `Welcome ${nameInput.value}! This is a classic game of Battleships, place your ships and ATTACK when ready!`,
@@ -198,14 +217,24 @@ export class Render {
     });
     const downButton = document.createElement("button");
     downButton.textContent = "DOWN";
+    downButton.addEventListener("click", () => {
+      this.move("down");
+    });
     const leftButton = document.createElement("button");
     leftButton.textContent = "LEFT";
+    leftButton.addEventListener("click", () => {
+      this.move("left");
+    });
     const rightButton = document.createElement("button");
     rightButton.textContent = "RIGHT";
+    rightButton.addEventListener("click", () => {
+      this.move("right");
+    });
     const rotateButton = document.createElement("button");
     rotateButton.textContent = "ROTATE";
-    const confirmButton = document.createElement("button");
-    confirmButton.textContent = "CONFIRM";
+    rotateButton.addEventListener("click", () => {
+      this.rotate();
+    });
 
     moveButtons.appendChild(upButton);
     moveButtons.appendChild(downButton);
@@ -223,60 +252,119 @@ export class Render {
     });
   }
   move(direction) {
-    const selected = this.player.game.ships.find(
+    const index = this.player.game.ships.findIndex(
       (ship) => ship.isSelected === true,
     );
-    const index = this.player.game.ships.indexOf(
-      this.player.game.ships.find((ship) => ship.isSelected === true),
-    );
+    const selected = this.player.game.ships[index];
     if (selected === undefined) return;
+    this.clearPlayerGrid();
+    const newPosition = JSON.parse(JSON.stringify(selected.position));
+    const testShip = { position: newPosition };
+    this.player.game.ships.splice(index, 1);
+
     switch (direction) {
       case "up":
-        const newPosition = selected.position[0][0] + 1;
-        this.clearPlayerGrid();
-        this.player.game.ships.splice(index, 1);
-        if (this.player.game.checkCollision(newPosition) === false) {
-          selected.position[0][0] = selected.position[0][0] + 1;
+        newPosition.forEach((pos) => {
+          pos[0] = pos[0] + 1;
+        });
+        if (this.player.game.checkCollision(testShip) === false) {
+          selected.position.forEach((pos) => {
+            pos[0] = pos[0] + 1;
+          });
           this.player.game.ships.push(selected);
-          this.player.game.placeShip(
-            selected.position[0],
-            selected.length,
-            selected.rotation,
-          );
         } else {
-          // this.player.game.ships.push(selected);
+          console.log("collision");
+          this.player.game.ships.push(selected);
         }
-        console.log(this.player.game.ships);
         break;
       case "down":
+        newPosition.forEach((pos) => {
+          pos[0] = pos[0] + -1;
+        });
+        if (this.player.game.checkCollision(testShip) === false) {
+          selected.position.forEach((pos) => {
+            pos[0] = pos[0] - 1;
+          });
+          this.player.game.ships.push(selected);
+        } else {
+          console.log("collision");
+          this.player.game.ships.push(selected);
+        }
         break;
       case "left":
+        newPosition.forEach((pos) => {
+          pos[1] = pos[1] - 1;
+        });
+        if (this.player.game.checkCollision(testShip) === false) {
+          selected.position.forEach((pos) => {
+            pos[1] = pos[1] - 1;
+          });
+          this.player.game.ships.push(selected);
+        } else {
+          console.log("collision");
+          this.player.game.ships.push(selected);
+        }
         break;
       case "right":
+        newPosition.forEach((pos) => {
+          pos[1] = pos[1] + 1;
+        });
+        if (this.player.game.checkCollision(testShip) === false) {
+          selected.position.forEach((pos) => {
+            pos[1] = pos[1] + 1;
+          });
+          this.player.game.ships.push(selected);
+        } else {
+          console.log("collision");
+          this.player.game.ships.push(selected);
+        }
         break;
     }
     this.createPlayer("player");
+    selected.position.forEach((pos) => {
+      const box = document.querySelector(`#player-${pos[0]}-${pos[1]}`);
+      box.classList.add("selected");
+    });
   }
   rotate() {
-    const selected = this.player.game.ships.find(
+    const index = this.player.game.ships.findIndex(
       (ship) => ship.isSelected === true,
     );
+    const selected = this.player.game.ships[index];
+    if (selected === undefined) return;
+    console.log(selected);
+    this.clearPlayerGrid();
+    // const newPosition = JSON.parse(JSON.stringify(selected.position));
+    const start = selected.position[0];
+    const newPosition = [];
+    newPosition.push(start);
+    this.player.game.ships.splice(index, 1);
+    if (selected.rotation === 0) {
+      selected.rotation = 1;
+      for (let i = 1; i < selected.size; i++) {
+        newPosition.push([newPosition[0][0] + i, newPosition[0][1]]);
+      }
+      selected.position = newPosition;
+
+      // CHECK COLLISION
+
+      this.player.game.ships.push(selected);
+    } else {
+      selected.position = 0;
+      for (let i = 1; i < selected.size; i++) {
+        newPosition.push([newPosition[0][0], newPosition[0][1]] + i);
+      }
+    }
+
+    this.createPlayer("player");
   }
   removeShip(ship) {
-    console.log(ship.position);
     ship.position.forEach((pos) => {
       const box = document.querySelector(`#player-${pos[0]}-${pos[1]}`);
       box.classList.remove("ship");
       box.classList.remove("selected");
     });
   }
-  // renderShip(ship) {
-  //   ship.position.forEach((pos) => {
-  //     const box = document.querySelector(`#player-${pos[0]}-${pos[1]}`);
-  //     box.classList.add("ship");
-  //     box.classList.add("selected");
-  //   });
-  // }
   clearControls() {
     const window = document.querySelector("#controlWindow");
     while (window.hasChildNodes()) {
