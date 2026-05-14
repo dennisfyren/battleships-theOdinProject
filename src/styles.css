@@ -93,7 +93,8 @@ body h1 {
 .welcome {
   position: absolute;
   position-anchor: --input;
-  position-area: top span-right;
+  position-area: top center;
+  top: calc(anchor(top) - 2rem);
   font-size: 1.4rem;
   margin-bottom: 0.1rem;
 }
@@ -135,6 +136,46 @@ body h1 {
 }
 .controls div button:hover {
   background-color: var(--hover-color);
+}
+#controlWindow div .move-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  grid-template-areas:
+    "rotate up confirm"
+    "left down right";
+  gap: 0;
+}
+#controlWindow div .move-buttons button {
+  width: 115px;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+.move-buttons button:nth-child(1) {
+  grid-area: up;
+}
+.move-buttons button:nth-child(2) {
+  grid-area: down;
+}
+.move-buttons button:nth-child(3) {
+  grid-area: left;
+}
+.move-buttons button:nth-child(4) {
+  grid-area: right;
+}
+#controlWindow div .move-buttons button:nth-child(5) {
+  grid-area: rotate;
+  background-color: var(--border-color);
+  color: black;
+}
+#controlWindow div .move-buttons button:nth-child(5):hover {
+  background-color: #87d9f0;
+}
+#controlWindow div .move-buttons button:nth-child(6) {
+  grid-area: confirm;
+  background-color: var(--border-color);
+  color: black;
 }
 #attack {
   grid-area: attack;

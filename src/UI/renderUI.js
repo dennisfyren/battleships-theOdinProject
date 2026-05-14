@@ -5,16 +5,18 @@ import { Computer } from "../players/playerAI.js";
 export class Render {
   constructor() {
     this.gamestart = false;
+    this.player = this.getData("player");
+    this.computer = this.getData("computer");
   }
   getData(type) {
     const player = new Player(type);
     const computer = new Computer(type);
     if (type === "player") {
-      player.game.placeShip([1, 2], 5, 0);
-      player.game.placeShip([4, 5], 4, 0);
-      player.game.placeShip([9, 1], 3, 1);
-      player.game.placeShip([7, 7], 3, 0);
-      player.game.placeShip([1, 10], 2, 0);
+      player.game.placeShip([1, 1], 5, 0);
+      player.game.placeShip([1, 2], 4, 0);
+      player.game.placeShip([1, 5], 3, 0);
+      player.game.placeShip([1, 7], 3, 0);
+      player.game.placeShip([1, 9], 2, 0);
       return player;
     }
     if (type === "computer") {
@@ -26,9 +28,11 @@ export class Render {
       return computer;
     }
   }
+  renderArea() {}
   createPlayer(type) {
     const animate = new UI();
-    const playerInfo = this.getData(type);
+    const playerInfo = this.player;
+    console.log(playerInfo);
     const player = document.querySelector("." + type);
     const playerDisplay = document.createElement("div");
     for (let j = 10; j > 0; j--) {
@@ -183,6 +187,33 @@ export class Render {
     const div = document.createElement("div");
     controlArea.appendChild(div);
 
+    const moveButtons = document.createElement("div");
+    moveButtons.classList.add("move-buttons");
+    div.appendChild(moveButtons);
+
+    const upButton = document.createElement("button");
+    upButton.textContent = "UP";
+    upButton.addEventListener("click", () => {
+      this.move("up");
+    });
+    const downButton = document.createElement("button");
+    downButton.textContent = "DOWN";
+    const leftButton = document.createElement("button");
+    leftButton.textContent = "LEFT";
+    const rightButton = document.createElement("button");
+    rightButton.textContent = "RIGHT";
+    const rotateButton = document.createElement("button");
+    rotateButton.textContent = "ROTATE";
+    const confirmButton = document.createElement("button");
+    confirmButton.textContent = "CONFIRM";
+
+    moveButtons.appendChild(upButton);
+    moveButtons.appendChild(downButton);
+    moveButtons.appendChild(leftButton);
+    moveButtons.appendChild(rightButton);
+    moveButtons.appendChild(rotateButton);
+    // moveButtons.appendChild(confirmButton);
+
     const attack = document.createElement("button");
     attack.textContent = "ATTACK";
     attack.id = "attack";
@@ -191,6 +222,61 @@ export class Render {
       this.log("Attack!");
     });
   }
+  move(direction) {
+    const selected = this.player.game.ships.find(
+      (ship) => ship.isSelected === true,
+    );
+    const index = this.player.game.ships.indexOf(
+      this.player.game.ships.find((ship) => ship.isSelected === true),
+    );
+    if (selected === undefined) return;
+    switch (direction) {
+      case "up":
+        const newPosition = selected.position[0][0] + 1;
+        this.clearPlayerGrid();
+        this.player.game.ships.splice(index, 1);
+        if (this.player.game.checkCollision(newPosition) === false) {
+          selected.position[0][0] = selected.position[0][0] + 1;
+          this.player.game.ships.push(selected);
+          this.player.game.placeShip(
+            selected.position[0],
+            selected.length,
+            selected.rotation,
+          );
+        } else {
+          // this.player.game.ships.push(selected);
+        }
+        console.log(this.player.game.ships);
+        break;
+      case "down":
+        break;
+      case "left":
+        break;
+      case "right":
+        break;
+    }
+    this.createPlayer("player");
+  }
+  rotate() {
+    const selected = this.player.game.ships.find(
+      (ship) => ship.isSelected === true,
+    );
+  }
+  removeShip(ship) {
+    console.log(ship.position);
+    ship.position.forEach((pos) => {
+      const box = document.querySelector(`#player-${pos[0]}-${pos[1]}`);
+      box.classList.remove("ship");
+      box.classList.remove("selected");
+    });
+  }
+  // renderShip(ship) {
+  //   ship.position.forEach((pos) => {
+  //     const box = document.querySelector(`#player-${pos[0]}-${pos[1]}`);
+  //     box.classList.add("ship");
+  //     box.classList.add("selected");
+  //   });
+  // }
   clearControls() {
     const window = document.querySelector("#controlWindow");
     while (window.hasChildNodes()) {
@@ -198,9 +284,15 @@ export class Render {
     }
   }
   clearLog() {
-    // const log = document.querySelector(".console");
-    // while (log.hasChildNodes()) {
-    //   log.removeChild(log.lastChild);
-    // }
+    const log = document.querySelector(".console");
+    while (log.hasChildNodes()) {
+      log.removeChild(log.lastChild);
+    }
+  }
+  clearPlayerGrid() {
+    const grid = document.querySelector(".player");
+    while (grid.hasChildNodes()) {
+      grid.removeChild(grid.lastChild);
+    }
   }
 }
