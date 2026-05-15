@@ -240,10 +240,7 @@ body h1 {
   transition: 0.2s ease-out;
   transform: scale(1.3);
 }
-.attack {
-  animation-duration: 0.8s;
-  animation-name: attack;
-}
+
 .grid-box {
   display: flex;
   border: none;
@@ -274,6 +271,28 @@ body h1 {
 .computer .miss:hover {
   transform: scale(1);
   transition: none;
+}
+
+.attack {
+  animation-duration: 0.8s;
+  animation-name: attack;
+}
+.bounce {
+  animation-duration: 0.15s;
+  animation-name: bounce;
+  animation-iteration-count: 2;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+  100% {
+    transform: translateY(-4px);
+  }
 }
 
 @keyframes drop-in {

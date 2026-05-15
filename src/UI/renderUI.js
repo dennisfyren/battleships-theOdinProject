@@ -50,8 +50,6 @@ export class Render {
         });
         innerBox.id = `${type}-${j}-${i}`;
 
-        //REFACTOR THIS INTO BUILDGRID METHOD!!
-
         // playerInfo.game.ships.forEach((ship) => {
         //   ship.position.forEach((pos) => {
         //     if (pos.toString() == [j, i].toString()) {
@@ -241,7 +239,6 @@ export class Render {
     moveButtons.appendChild(leftButton);
     moveButtons.appendChild(rightButton);
     moveButtons.appendChild(rotateButton);
-    // moveButtons.appendChild(confirmButton);
 
     const attack = document.createElement("button");
     attack.textContent = "ATTACK";
@@ -252,12 +249,12 @@ export class Render {
     });
   }
   move(direction) {
+    const animate = new UI();
     const index = this.player.game.ships.findIndex(
       (ship) => ship.isSelected === true,
     );
     const selected = this.player.game.ships[index];
     if (selected === undefined) return;
-    this.clearPlayerGrid();
     const newPosition = JSON.parse(JSON.stringify(selected.position));
     const testShip = { position: newPosition };
     this.player.game.ships.splice(index, 1);
@@ -271,10 +268,14 @@ export class Render {
           selected.position.forEach((pos) => {
             pos[0] = pos[0] + 1;
           });
+          this.clearPlayerGrid();
           this.player.game.ships.push(selected);
+          this.createPlayer("player");
         } else {
           console.log("collision");
           this.player.game.ships.push(selected);
+          animate.bounce(selected);
+          this.log("Collision Imminent");
         }
         break;
       case "down":
@@ -285,8 +286,11 @@ export class Render {
           selected.position.forEach((pos) => {
             pos[0] = pos[0] - 1;
           });
+          this.clearPlayerGrid();
           this.player.game.ships.push(selected);
+          this.createPlayer("player");
         } else {
+          animate.bounce(selected);
           console.log("collision");
           this.player.game.ships.push(selected);
         }
@@ -299,8 +303,11 @@ export class Render {
           selected.position.forEach((pos) => {
             pos[1] = pos[1] - 1;
           });
+          this.clearPlayerGrid();
           this.player.game.ships.push(selected);
+          this.createPlayer("player");
         } else {
+          animate.bounce(selected);
           console.log("collision");
           this.player.game.ships.push(selected);
         }
@@ -313,50 +320,68 @@ export class Render {
           selected.position.forEach((pos) => {
             pos[1] = pos[1] + 1;
           });
+          this.clearPlayerGrid();
           this.player.game.ships.push(selected);
+          this.createPlayer("player");
         } else {
-          console.log("collision");
+          animate.bounce(selected);
           this.player.game.ships.push(selected);
         }
         break;
     }
-    this.createPlayer("player");
     selected.position.forEach((pos) => {
       const box = document.querySelector(`#player-${pos[0]}-${pos[1]}`);
       box.classList.add("selected");
     });
   }
   rotate() {
+    const animate = new UI();
     const index = this.player.game.ships.findIndex(
       (ship) => ship.isSelected === true,
     );
     const selected = this.player.game.ships[index];
     if (selected === undefined) return;
-    console.log(selected);
-    this.clearPlayerGrid();
-    // const newPosition = JSON.parse(JSON.stringify(selected.position));
     const start = selected.position[0];
     const newPosition = [];
     newPosition.push(start);
     this.player.game.ships.splice(index, 1);
     if (selected.rotation === 0) {
-      selected.rotation = 1;
       for (let i = 1; i < selected.size; i++) {
         newPosition.push([newPosition[0][0] + i, newPosition[0][1]]);
       }
-      selected.position = newPosition;
+      const testShip = { position: newPosition };
+      if (this.player.game.checkCollision(testShip) === false) {
+        this.clearPlayerGrid();
 
-      // CHECK COLLISION
+        selected.rotation = 1;
+        selected.position = newPosition;
+        this.player.game.ships.push(selected);
 
-      this.player.game.ships.push(selected);
+        this.createPlayer("player");
+      } else {
+        this.player.game.ships.push(selected);
+        animate.bounce(selected);
+        this.log("Collision Imminent");
+      }
     } else {
-      selected.position = 0;
       for (let i = 1; i < selected.size; i++) {
-        newPosition.push([newPosition[0][0], newPosition[0][1]] + i);
+        newPosition.push([newPosition[0][0], newPosition[0][1] + i]);
+      }
+      const testShip = { position: newPosition };
+      if (this.player.game.checkCollision(testShip) === false) {
+        this.clearPlayerGrid();
+
+        selected.rotation = 0;
+        selected.position = newPosition;
+        this.player.game.ships.push(selected);
+
+        this.createPlayer("player");
+      } else {
+        this.player.game.ships.push(selected);
+        animate.bounce(selected);
+        this.log("Collision Imminent");
       }
     }
-
-    this.createPlayer("player");
   }
   removeShip(ship) {
     ship.position.forEach((pos) => {
