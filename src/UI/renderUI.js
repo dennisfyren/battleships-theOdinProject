@@ -2,37 +2,65 @@ import { UI } from "./animations.js";
 import { Player } from "../players/playerHuman.js";
 import { Computer } from "../players/playerAI.js";
 import { Game } from "../gameLogic/game.js";
+import { Random } from "../gameLogic/randomGenerator.js";
 
 export class Render {
   constructor() {
     this.gamestart = false;
+    this.gameOver = false;
+    this.isPlayerTurn = true;
     this.player = this.getData("player");
     this.computer = this.getData("computer");
     this.game = new Game();
+    this.validTiles = [];
   }
   getData(type) {
     const player = new Player(type);
     const computer = new Computer(type);
+    const random = new Random();
     if (type === "player") {
-      player.game.placeShip([1, 1], 5, 0);
-      player.game.placeShip([1, 2], 4, 0);
-      player.game.placeShip([1, 5], 3, 0);
-      player.game.placeShip([1, 7], 3, 0);
-      player.game.placeShip([1, 9], 2, 0);
+      const coordinates = [];
+      for (let i = 1; i <= 10; i++) {
+        for (let j = 1; j <= 10; j++) {
+          coordinates.push([i, j]);
+        }
+      }
+      const sizes = [5, 4, 3, 3, 2];
+      while (sizes.length > 0) {
+        const result = player.game.placeShip(
+          coordinates.splice(random.position(coordinates), 1)[0],
+          sizes[sizes.length - 1],
+          random.rotation(),
+        );
+        if (result.startsWith("Created")) {
+          sizes.pop();
+        }
+      }
       return player;
     }
     if (type === "computer") {
-      computer.game.placeShip([2, 9], 5, 0);
-      computer.game.placeShip([4, 2], 4, 1);
-      computer.game.placeShip([7, 2], 3, 1);
-      computer.game.placeShip([7, 6], 3, 0);
-      computer.game.placeShip([2, 7], 2, 0);
+      const coordinates = [];
+      for (let i = 1; i <= 10; i++) {
+        for (let j = 1; j <= 10; j++) {
+          coordinates.push([i, j]);
+        }
+      }
+      const sizes = [5, 4, 3, 3, 2];
+      while (sizes.length > 0) {
+        const result = computer.game.placeShip(
+          coordinates.splice(random.position(coordinates), 1)[0],
+          sizes[sizes.length - 1],
+          random.rotation(),
+        );
+        if (result.startsWith("Created")) {
+          sizes.pop();
+        }
+      }
       return computer;
     }
   }
   createPlayer(type) {
     const animate = new UI();
-    const playerInfo = this.player;
     const player = document.querySelector("." + type);
     const playerDisplay = document.createElement("div");
     for (let j = 10; j > 0; j--) {
@@ -46,7 +74,7 @@ export class Render {
               box.classList.remove("selected");
             });
           }
-          playerInfo.game.ships.forEach((ship) => {
+          this.player.game.ships.forEach((ship) => {
             ship.isSelected = false;
           });
         });
@@ -57,18 +85,24 @@ export class Render {
               this.log(`Please start the game first!`);
               return;
             }
+            if (this.isPlayerTurn === false) {
+              this.log("Wait for your turn");
+              return;
+            }
+            this.isPlayerTurn = false;
             animate.attack(innerBox);
-            const result = playerInfo.game.recieveAttack([j, i]);
-            if (result === "Hit!") {
+            const result = this.computer.game.recieveAttack([j, i]);
+            if (result[0] === "Hit!") {
               innerBox.classList.add("hit");
               this.log(`You fired a shot at [${j}, ${i}], it's a HIT!`);
-              this.rePaint(playerInfo.game.ships);
-            } else if (result === "Miss!") {
+              this.rePaint(this.computer.game.ships);
+            } else if (result[0] === "Miss!") {
               innerBox.classList.add("miss");
               this.log(`You fired a shot at [${j}, ${i}], it's a MISS.`);
             } else {
               return;
             }
+            this.computerTurn();
           });
         }
         innerBox.classList.add("grid-inner-box");
@@ -249,7 +283,8 @@ export class Render {
     attack.id = "attack";
     div.appendChild(attack);
     attack.addEventListener("click", () => {
-      this.log("Let the game begin!");
+      this.log("Let the game begin! You go first!");
+      this.gamestart = true;
       this.player.game.ships.forEach((ship) => {
         ship.isSelected = false;
       });
@@ -286,7 +321,6 @@ export class Render {
           this.player.game.ships.push(selected);
           this.createPlayer("player");
         } else {
-          console.log("collision");
           this.player.game.ships.push(selected);
           animate.bounce(selected);
         }
@@ -307,7 +341,6 @@ export class Render {
           this.createPlayer("player");
         } else {
           animate.bounce(selected);
-          console.log("collision");
           this.player.game.ships.push(selected);
         }
         break;
@@ -327,7 +360,6 @@ export class Render {
           this.createPlayer("player");
         } else {
           animate.bounce(selected);
-          console.log("collision");
           this.player.game.ships.push(selected);
         }
         break;
@@ -372,7 +404,6 @@ export class Render {
         newPosition.push([newPosition[0][0] + i, newPosition[0][1]]);
       }
       const testShip = { position: newPosition };
-      console.log(testShip.position);
       if (
         this.player.game.checkCollision(testShip) === false &&
         this.checkBoundry(testShip) === false
@@ -437,6 +468,62 @@ export class Render {
     const grid = document.querySelector(".player");
     while (grid.hasChildNodes()) {
       grid.removeChild(grid.lastChild);
+    }
+  }
+  computerTurn() {
+    if (this.isPlayerTurn === false && this.gameOver === false) {
+      setTimeout(() => {
+        const animate = new UI();
+        let result;
+        let prev = this.computer.previousHit;
+        if (this.computer.previousAttack === "Hit!") {
+          const possibleTiles = [
+            [prev[0] + 1, prev[1]],
+            [prev[0] - 1, prev[1]],
+            [prev[0], prev[1] + 1],
+            [prev[0], prev[1] - 1],
+          ];
+          this.validTiles = this.validTiles = possibleTiles
+            .filter((pos) => !this.checkBoundry({ position: [pos] }))
+            .filter(
+              (pos) =>
+                !this.player.game.previousAttacks.some(
+                  (attack) => attack.toString() === pos.toString(),
+                ),
+            );
+          console.log(possibleTiles);
+        }
+        if (this.validTiles.length > 0) {
+          result = this.player.game.recieveAttack(this.validTiles[0]);
+          if (result[0] === "Hit!") {
+            console.log("hit");
+            this.validTiles = [];
+          } else {
+            console.log("miss");
+            this.validTiles.shift();
+          }
+        } else {
+          const attack = this.computer.attack();
+          result = this.player.game.recieveAttack(attack);
+        }
+        this.log(`The computer shot at [${result[1]}], it's a ${result[0]}`);
+        const box = document.querySelector(
+          `#player-${result[1][0]}-${result[1][1]}`,
+        );
+        animate.attack(box);
+        if (result[0] === "Hit!") {
+          box.classList.add("hit");
+          this.rePaint(this.player.game.ships);
+          this.computer.previousAttack = "Hit!";
+          this.computer.previousHit = result[1];
+        } else {
+          this.computer.previousAttack = "Miss";
+          box.classList.add("miss");
+        }
+        this.isPlayerTurn = true;
+      }, 300);
+
+      //FIX REPAINT FUNCTION
     }
   }
 }

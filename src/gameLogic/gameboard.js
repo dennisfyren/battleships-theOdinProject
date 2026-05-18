@@ -73,7 +73,11 @@ export class Gameboard {
     } else {
       this.checkRemaining();
     }
-    return hit ? "Hit!" : "Miss!";
+    if (hit === true) {
+      return ["Hit!", position];
+    } else {
+      return ["Miss!", position];
+    }
   }
   checkCollision(ship) {
     return this.ships.some((curr) => {

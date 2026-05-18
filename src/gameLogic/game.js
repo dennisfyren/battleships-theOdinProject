@@ -1,4 +1,4 @@
-export class Game {
+class Game {
   constructor() {
     this.playerTurn = true;
     this.gamestart = false;
@@ -11,3 +11,5 @@ export class Game {
     }
   }
 }
+
+export { Game };
