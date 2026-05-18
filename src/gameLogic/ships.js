@@ -12,15 +12,16 @@ export class Ship {
   }
   hit() {
     this.hits++;
-    this.sink();
+    return this.sink();
   }
   sink() {
     if (this.hits == this.size) {
       const render = new Render();
       this.isSunk = true;
       setTimeout(() => {
-        render.log(`You sunk the enemy ship`);
-      }, 1000);
+        render.log(`The ship sunk`);
+      }, 500);
+      return true;
     }
   }
 }

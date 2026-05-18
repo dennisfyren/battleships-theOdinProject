@@ -95,7 +95,7 @@ export class Render {
             if (result[0] === "Hit!") {
               innerBox.classList.add("hit");
               this.log(`You fired a shot at [${j}, ${i}], it's a HIT!`);
-              this.rePaint(this.computer.game.ships);
+              this.rePaint(this.computer.game.ships, "computer");
             } else if (result[0] === "Miss!") {
               innerBox.classList.add("miss");
               this.log(`You fired a shot at [${j}, ${i}], it's a MISS.`);
@@ -155,15 +155,15 @@ export class Render {
       logWindow.removeChild(logWindow.lastChild);
     }
   }
-  rePaint(ship) {
+  rePaint(ship, player) {
     const result = ship.filter((curr) => curr.isSunk);
     if (result.length !== 0) {
       result.forEach((item) => {
         item.position.forEach((pos) => {
-          const box = document.querySelector(`#computer-${pos[0]}-${pos[1]}`);
+          const box = document.querySelector(`#${player}-${pos[0]}-${pos[1]}`);
           setTimeout(() => {
             box.classList.add("sunk");
-          }, 800);
+          }, 400);
         });
       });
     }
@@ -475,37 +475,47 @@ export class Render {
       setTimeout(() => {
         const animate = new UI();
         let result;
-        let prev = this.computer.previousHit;
-        if (this.computer.previousAttack === "Hit!") {
+
+        if (
+          this.computer.previousAttack === "Hit!" &&
+          this.validTiles.length === 0
+        ) {
+          const prev = this.computer.previousHit;
           const possibleTiles = [
             [prev[0] + 1, prev[1]],
             [prev[0] - 1, prev[1]],
             [prev[0], prev[1] + 1],
             [prev[0], prev[1] - 1],
           ];
-          this.validTiles = this.validTiles = possibleTiles
+          const newFilteredTiles = possibleTiles
             .filter((pos) => !this.checkBoundry({ position: [pos] }))
             .filter(
               (pos) =>
                 !this.player.game.previousAttacks.some(
                   (attack) => attack.toString() === pos.toString(),
                 ),
+            )
+            .filter(
+              (pos) =>
+                !this.validTiles.some(
+                  (tile) => tile.toString() === pos.toString(),
+                ),
             );
-          console.log(possibleTiles);
+          this.validTiles.push(...newFilteredTiles);
         }
+
         if (this.validTiles.length > 0) {
           result = this.player.game.recieveAttack(this.validTiles[0]);
           if (result[0] === "Hit!") {
-            console.log("hit");
             this.validTiles = [];
           } else {
-            console.log("miss");
             this.validTiles.shift();
           }
         } else {
           const attack = this.computer.attack();
           result = this.player.game.recieveAttack(attack);
         }
+
         this.log(`The computer shot at [${result[1]}], it's a ${result[0]}`);
         const box = document.querySelector(
           `#player-${result[1][0]}-${result[1][1]}`,
@@ -513,8 +523,13 @@ export class Render {
         animate.attack(box);
         if (result[0] === "Hit!") {
           box.classList.add("hit");
-          this.rePaint(this.player.game.ships);
-          this.computer.previousAttack = "Hit!";
+          this.rePaint(this.player.game.ships, "player");
+          if (result[2] === true) {
+            this.computer.previousAttack = "Miss";
+            this.validTiles = [];
+          } else {
+            this.computer.previousAttack = "Hit!";
+          }
           this.computer.previousHit = result[1];
         } else {
           this.computer.previousAttack = "Miss";
@@ -522,8 +537,8 @@ export class Render {
         }
         this.isPlayerTurn = true;
       }, 300);
-
-      //FIX REPAINT FUNCTION
     }
   }
 }
+
+// Something is wrong with the validMoves.
