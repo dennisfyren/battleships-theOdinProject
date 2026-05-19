@@ -8,6 +8,7 @@ export class Computer {
     this.name = name;
     this.game = new Gameboard();
     this.attacks = attacks();
+    this.previousAttacks = [];
     this.previousAttack = null;
     this.previousHit = null;
   }

@@ -89,9 +89,15 @@ export class Render {
               this.log("Wait for your turn");
               return;
             }
-            this.isPlayerTurn = false;
             animate.attack(innerBox);
             const result = this.computer.game.recieveAttack([j, i]);
+            if (result[0].startsWith("C")) {
+              this.log(
+                "Can't attack the same tile twice, please select another!",
+              );
+              return;
+            }
+            this.isPlayerTurn = false;
             if (result[0] === "Hit!") {
               innerBox.classList.add("hit");
               this.log(`You fired a shot at [${j}, ${i}], it's a HIT!`);
@@ -100,6 +106,21 @@ export class Render {
               innerBox.classList.add("miss");
               this.log(`You fired a shot at [${j}, ${i}], it's a MISS.`);
             } else {
+              return;
+            }
+            if (this.computer.game.isGameOver === true) {
+              const winMessage = document.createElement("h1");
+              const area = document.querySelector("#controlWindow");
+              winMessage.textContent = "You won!";
+              winMessage.classList.add("win");
+
+              area.appendChild(winMessage);
+
+              const btn = document.createElement("button");
+              btn.textContent = "Play!";
+              area.appendChild(btn);
+
+              this.log("You win!");
               return;
             }
             this.computerTurn();
@@ -506,11 +527,11 @@ export class Render {
 
         if (this.validTiles.length > 0) {
           result = this.player.game.recieveAttack(this.validTiles[0]);
-          if (result[0] === "Hit!") {
-            this.validTiles = [];
-          } else {
-            this.validTiles.shift();
-          }
+          const index = this.computer.attacks.findIndex(
+            (attack) => attack.toString() === this.validTiles[0].toString(),
+          );
+          this.computer.attacks.splice(index, 1);
+          this.validTiles.shift();
         } else {
           const attack = this.computer.attack();
           result = this.player.game.recieveAttack(attack);
@@ -520,6 +541,7 @@ export class Render {
         const box = document.querySelector(
           `#player-${result[1][0]}-${result[1][1]}`,
         );
+
         animate.attack(box);
         if (result[0] === "Hit!") {
           box.classList.add("hit");
@@ -535,8 +557,25 @@ export class Render {
           this.computer.previousAttack = "Miss";
           box.classList.add("miss");
         }
+        // this.player.game.previousAttacks.push(result[1]);
+        console.log(this.player.game.previousAttacks);
         this.isPlayerTurn = true;
-      }, 300);
+      }, 700);
+    }
+    if (this.player.game.isGameOver === true) {
+      const winMessage = document.createElement("h1");
+      const area = document.querySelector("#controlWindow");
+      winMessage.textContent = "You lost... Play again?";
+      winMessage.classList.add("loss");
+
+      const btn = document.createElement("button");
+      btn.textContent = "Play!";
+      area.appendChild(btn);
+
+      area.appendChild(winMessage);
+
+      this.log("You lost...");
+      return;
     }
   }
 }

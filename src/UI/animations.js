@@ -1,5 +1,6 @@
 export class UI {
   attack(element) {
+    console.log(element);
     element.classList.add("attack");
     setTimeout(() => {
       element.classList.remove("attack");

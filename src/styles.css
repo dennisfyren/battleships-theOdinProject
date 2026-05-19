@@ -43,8 +43,9 @@ body h1 {
 .main {
   padding: 2rem 10% 2rem 10%;
   display: grid;
+  height: calc(100vh - h1-height);
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 2fr 1fr;
+  grid-template-rows: auto 1fr;
   justify-items: center;
   grid-template-areas:
     "player computer"
@@ -69,14 +70,15 @@ body h1 {
 }
 .player,
 .computer {
-  padding: 5rem;
+  padding: 2rem;
   border-radius: 5%;
 }
 .controls {
-  margin-top: 5rem;
+  margin-top: 2rem;
   grid-area: control;
   border: 1px solid var(--border-color);
   width: 80%;
+  height: 25vh;
   border-radius: 0.4rem;
   padding: 2rem;
   display: grid;

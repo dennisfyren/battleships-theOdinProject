@@ -5,6 +5,7 @@ export class Gameboard {
     this.ships = [];
     this.missedAttacks = [];
     this.previousAttacks = [];
+    this.isGameOver = false;
   }
   placeShip(position, length, rotation) {
     if (this.ships.length === 5) return "Too many ships";
@@ -93,5 +94,8 @@ export class Gameboard {
     const ships = this.ships;
     const response = this.ships.every((ship) => ship.isSunk === true);
     console.log(!response ? "Go on" : "Game over");
+    if (response) {
+      this.isGameOver = true;
+    }
   }
 }
