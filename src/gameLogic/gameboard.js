@@ -54,7 +54,9 @@ export class Gameboard {
       return "Can't attack the same tile twice";
     this.previousAttacks.push(position);
     let sunk;
+    let shipPosition = [];
     const hit = this.ships.some((ship) => {
+      shipPosition = ship.position;
       return ship.position.some((tile) => {
         if (position.toString() === tile.toString()) {
           sunk = ship.hit();
@@ -76,7 +78,7 @@ export class Gameboard {
       this.checkRemaining();
     }
     if (hit === true) {
-      return ["Hit!", position, sunk];
+      return ["Hit!", position, sunk, shipPosition];
     } else {
       return ["Miss!", position];
     }
@@ -93,7 +95,6 @@ export class Gameboard {
   checkRemaining() {
     const ships = this.ships;
     const response = this.ships.every((ship) => ship.isSunk === true);
-    console.log(!response ? "Go on" : "Game over");
     if (response) {
       this.isGameOver = true;
     }

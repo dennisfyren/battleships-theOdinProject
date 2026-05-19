@@ -117,7 +117,11 @@ export class Render {
               area.appendChild(winMessage);
 
               const btn = document.createElement("button");
-              btn.textContent = "Play!";
+              btn.addEventListener("click", () => {
+                location.reload();
+              });
+              btn.textContent = "Play again!";
+              btn.style.borderRadius = "0.5rem";
               area.appendChild(btn);
 
               this.log("You win!");
@@ -502,27 +506,7 @@ export class Render {
           this.validTiles.length === 0
         ) {
           const prev = this.computer.previousHit;
-          const possibleTiles = [
-            [prev[0] + 1, prev[1]],
-            [prev[0] - 1, prev[1]],
-            [prev[0], prev[1] + 1],
-            [prev[0], prev[1] - 1],
-          ];
-          const newFilteredTiles = possibleTiles
-            .filter((pos) => !this.checkBoundry({ position: [pos] }))
-            .filter(
-              (pos) =>
-                !this.player.game.previousAttacks.some(
-                  (attack) => attack.toString() === pos.toString(),
-                ),
-            )
-            .filter(
-              (pos) =>
-                !this.validTiles.some(
-                  (tile) => tile.toString() === pos.toString(),
-                ),
-            );
-          this.validTiles.push(...newFilteredTiles);
+          this.validTiles.push(...this.generateValidMoves(prev));
         }
 
         if (this.validTiles.length > 0) {
@@ -544,11 +528,19 @@ export class Render {
 
         animate.attack(box);
         if (result[0] === "Hit!") {
+          this.validTiles.push(...this.generateValidMoves(result[1]));
           box.classList.add("hit");
           this.rePaint(this.player.game.ships, "player");
           if (result[2] === true) {
+            result[3].forEach((pos) => {
+              const index = this.validTiles.findIndex(
+                (tile) => pos.toString() === tile.toString(),
+              );
+              this.validTiles.splice(index, 1);
+            });
             this.computer.previousAttack = "Miss";
-            this.validTiles = [];
+
+            // this.validTiles = [];
           } else {
             this.computer.previousAttack = "Hit!";
           }
@@ -557,26 +549,49 @@ export class Render {
           this.computer.previousAttack = "Miss";
           box.classList.add("miss");
         }
-        // this.player.game.previousAttacks.push(result[1]);
-        console.log(this.player.game.previousAttacks);
+        if (this.player.game.isGameOver === true) {
+          const winMessage = document.createElement("h1");
+          const area = document.querySelector("#controlWindow");
+          winMessage.textContent = "You lost... Play again?";
+          winMessage.classList.add("loss");
+
+          const btn = document.createElement("button");
+          btn.addEventListener("click", () => {
+            location.reload();
+          });
+          area.appendChild(winMessage);
+
+          btn.textContent = "Play again!";
+          btn.style.borderRadius = "0.5rem";
+          area.appendChild(btn);
+
+          this.log("You lost...");
+          return;
+        }
         this.isPlayerTurn = true;
       }, 700);
     }
-    if (this.player.game.isGameOver === true) {
-      const winMessage = document.createElement("h1");
-      const area = document.querySelector("#controlWindow");
-      winMessage.textContent = "You lost... Play again?";
-      winMessage.classList.add("loss");
-
-      const btn = document.createElement("button");
-      btn.textContent = "Play!";
-      area.appendChild(btn);
-
-      area.appendChild(winMessage);
-
-      this.log("You lost...");
-      return;
-    }
+  }
+  generateValidMoves(prev) {
+    const possibleTiles = [
+      [prev[0] + 1, prev[1]],
+      [prev[0] - 1, prev[1]],
+      [prev[0], prev[1] + 1],
+      [prev[0], prev[1] - 1],
+    ];
+    const newFilteredTiles = possibleTiles
+      .filter((pos) => !this.checkBoundry({ position: [pos] }))
+      .filter(
+        (pos) =>
+          !this.player.game.previousAttacks.some(
+            (attack) => attack.toString() === pos.toString(),
+          ),
+      )
+      .filter(
+        (pos) =>
+          !this.validTiles.some((tile) => tile.toString() === pos.toString()),
+      );
+    return newFilteredTiles;
   }
 }
 
